@@ -12,6 +12,7 @@ from addons.base.tests.models import (
     OAuthAddonUserSettingTestSuiteMixin
 )
 from addons.s3.models import NodeSettings
+from addons.s3.utils import Owner
 from addons.s3.tests.factories import (
     S3UserSettingsFactory,
     S3NodeSettingsFactory,
@@ -25,6 +26,24 @@ class TestUserSettings(OAuthAddonUserSettingTestSuiteMixin, unittest.TestCase):
     short_name = 's3'
     full_name = 'Amazon S3'
     ExternalAccountFactory = S3AccountFactory
+
+
+class TestOwner(unittest.TestCase):
+
+    def test_from_dict_uses_display_name(self):
+        owner = Owner.from_dict({
+            'DisplayName': 's3.user',
+            'ID': '1234567890',
+        })
+        assert owner.display_name == 's3.user'
+        assert owner.id == '1234567890'
+
+    def test_from_dict_falls_back_to_id_without_display_name(self):
+        owner = Owner.from_dict({
+            'ID': '1234567890',
+        })
+        assert owner.display_name == '1234567890'
+        assert owner.id == '1234567890'
 
 class TestNodeSettings(OAuthAddonNodeSettingsTestSuiteMixin, unittest.TestCase):
 
